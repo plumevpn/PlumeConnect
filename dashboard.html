@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Личный кабинет — Plume Connect</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+</head>
+<body class="dashboard-page">
+
+<!-- ========================
+     HEADER
+======================== -->
+<header class="dashboard-header">
+  <div class="dashboard-header-inner">
+    <a href="index.html" class="dashboard-header-logo">
+      <div class="logo-icon">🪶</div>
+      Plume Connect
+    </a>
+
+    <div class="dashboard-header-user">
+      <div class="user-avatar" id="userAvatar">?</div>
+      <div class="user-info-text">
+        <span class="user-name" id="userName">Загрузка...</span>
+        <span class="user-email" id="userEmail"></span>
+      </div>
+    </div>
+
+    <button class="btn btn-ghost btn-sm" id="logoutBtn">
+      <i class="fas fa-right-from-bracket"></i>
+      <span class="hide-mobile">Выйти</span>
+    </button>
+  </div>
+</header>
+
+<!-- ========================
+     DASHBOARD BODY
+======================== -->
+<main class="dashboard-body">
+
+  <!-- Welcome Banner -->
+  <div class="welcome-banner" id="welcomeBanner">
+    <div class="welcome-icon">🛡️</div>
+    <div class="welcome-text">
+      <h3 id="welcomeText">Добро пожаловать!</h3>
+      <p>Управляйте подписками, смотрите статистику и настраивайте подключение</p>
+    </div>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div class="tabs-nav" id="tabsNav">
+    <button class="tab-btn active" data-tab="plans">
+      <i class="fas fa-box"></i> Тарифы
+    </button>
+    <button class="tab-btn" data-tab="subscriptions">
+      <i class="fas fa-rotate"></i> Мои подписки
+      <span class="tab-badge" id="subsBadge" style="display:none;">0</span>
+    </button>
+    <button class="tab-btn" data-tab="devices">
+      <i class="fas fa-mobile-screen"></i> Устройства
+    </button>
+    <button class="tab-btn" data-tab="history">
+      <i class="fas fa-chart-line"></i> История
+    </button>
+  </div>
+
+  <!-- ==================
+       TAB: PLANS
+  ================== -->
+  <div class="tab-panel active" id="tab-plans">
+    <div class="section-actions">
+      <h3>Доступные тарифы</h3>
+    </div>
+    <div class="plans-grid" id="plansGrid">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Загружаем тарифы...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================
+       TAB: SUBSCRIPTIONS
+  ================== -->
+  <div class="tab-panel" id="tab-subscriptions">
+    <div class="section-actions">
+      <h3>Мои подписки</h3>
+      <button class="btn btn-green btn-sm" id="refreshSubsBtn">
+        <i class="fas fa-rotate-right"></i> Обновить
+      </button>
+    </div>
+    <div class="subs-list" id="subsList">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Загружаем подписки...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================
+       TAB: DEVICES
+  ================== -->
+  <div class="tab-panel" id="tab-devices">
+    <div class="section-actions">
+      <h3>Подключённые устройства</h3>
+      <button class="btn btn-ghost btn-sm" id="refreshDevicesBtn">
+        <i class="fas fa-rotate-right"></i> Обновить
+      </button>
+    </div>
+    <div class="alert alert-info" id="devicesHint" style="display:flex; margin-bottom:16px;">
+      <i class="fas fa-circle-info"></i>
+      <span>Выберите подписку, чтобы увидеть подключённые устройства</span>
+    </div>
+    <div id="devicesSubSelect" style="margin-bottom:16px; display:none;">
+      <label class="form-label">Подписка</label>
+      <select class="form-input" id="devicesSubDropdown" style="max-width:400px;"></select>
+    </div>
+    <div class="devices-list" id="devicesList">
+      <div class="empty-state">
+        <div class="empty-state-icon">📱</div>
+        <h3>Устройств нет</h3>
+        <p>Подключите первое устройство, используя конфигурационный файл из подписки</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================
+       TAB: HISTORY
+  ================== -->
+  <div class="tab-panel" id="tab-history">
+    <div class="section-actions">
+      <h3>История подключений</h3>
+      <button class="btn btn-ghost btn-sm" id="refreshHistoryBtn">
+        <i class="fas fa-rotate-right"></i> Обновить
+      </button>
+    </div>
+    <div id="historySubSelect" style="margin-bottom:16px;">
+      <label class="form-label">Выберите подписку</label>
+      <select class="form-input" id="historySubDropdown" style="max-width:400px;">
+        <option value="">— выберите подписку —</option>
+      </select>
+    </div>
+    <div id="historyContent">
+      <div class="empty-state">
+        <div class="empty-state-icon">📊</div>
+        <h3>Выберите подписку</h3>
+        <p>История соединений будет показана здесь</p>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ========================
+     MODALS
+======================== -->
+
+<!-- Confirm Freeze Modal -->
+<div class="modal-overlay" id="freezeModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Заморозить подписку</h3>
+      <button class="modal-close" onclick="closeModal('freezeModal')">
+        <i class="fas fa-xmark"></i>
+      </button>
+    </div>
+    <p style="color:var(--slate-200); font-size:14px; line-height:1.6;">
+      Подписка будет заморожена. Время заморозки не будет засчитываться в срок подписки.
+      Вы сможете разморозить её в любой момент.
+    </p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('freezeModal')">Отмена</button>
+      <button class="btn btn-outline-green" id="confirmFreezeBtn">Заморозить</button>
+    </div>
+  </div>
+</div>
+
+<!-- Buy Traffic Modal -->
+<div class="modal-overlay" id="trafficModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Купить трафик</h3>
+      <button class="modal-close" onclick="closeModal('trafficModal')">
+        <i class="fas fa-xmark"></i>
+      </button>
+    </div>
+    <div class="form-group" style="margin-top:8px;">
+      <label class="form-label">Количество GB</label>
+      <div class="form-input-wrapper">
+        <i class="fas fa-database form-input-icon"></i>
+        <input type="number" id="trafficGb" class="form-input has-icon" value="10" min="1" max="1000" />
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('trafficModal')">Отмена</button>
+      <button class="btn btn-green" id="confirmTrafficBtn">Купить</button>
+    </div>
+  </div>
+</div>
+
+<!-- Upgrade Modal -->
+<div class="modal-overlay" id="upgradeModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Повысить тариф</h3>
+      <button class="modal-close" onclick="closeModal('upgradeModal')">
+        <i class="fas fa-xmark"></i>
+      </button>
+    </div>
+    <div class="form-group" style="margin-top:8px;">
+      <label class="form-label">Новый тариф</label>
+      <select class="form-input" id="upgradePlanSelect"></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('upgradeModal')">Отмена</button>
+      <button class="btn btn-green" id="confirmUpgradeBtn">Повысить</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="app.js"></script>
+<script src="api.js"></script>
+<script src="auth.js"></script>
+<script src="dashboard.js"></script>
+</body>
+</html>

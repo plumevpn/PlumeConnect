@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Регистрация — Plume Connect</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<div class="auth-page">
+  <div class="auth-bg">
+    <div class="auth-bg-gradient"></div>
+    <div class="auth-bg-grid"></div>
+  </div>
+
+  <div class="auth-card">
+    <!-- Logo -->
+    <div class="auth-logo">
+      <a href="index.html" class="auth-logo-mark">🪶</a>
+      <h2>Plume Connect</h2>
+    </div>
+
+    <!-- Title -->
+    <div class="auth-title">Создать аккаунт</div>
+    <p class="auth-subtitle">Зарегистрируйтесь и получите доступ к VPN</p>
+
+    <!-- Alert -->
+    <div class="alert alert-error" id="regAlert">
+      <i class="fas fa-circle-exclamation"></i>
+      <span id="regAlertMsg">Ошибка регистрации</span>
+    </div>
+
+    <div class="alert alert-success" id="regSuccess">
+      <i class="fas fa-circle-check"></i>
+      <span>Аккаунт создан! Входим...</span>
+    </div>
+
+    <!-- Form -->
+    <form id="registerForm" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="name">Ваше имя</label>
+        <div class="form-input-wrapper">
+          <i class="fas fa-user form-input-icon"></i>
+          <input
+            type="text"
+            id="name"
+            class="form-input has-icon"
+            placeholder="Иван"
+            autocomplete="given-name"
+            required
+          />
+        </div>
+        <span class="form-error" id="nameError">Введите ваше имя</span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <div class="form-input-wrapper">
+          <i class="fas fa-envelope form-input-icon"></i>
+          <input
+            type="email"
+            id="email"
+            class="form-input has-icon"
+            placeholder="you@example.com"
+            autocomplete="email"
+            required
+          />
+        </div>
+        <span class="form-error" id="emailError">Введите корректный email</span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Пароль</label>
+        <div class="form-input-wrapper">
+          <i class="fas fa-lock form-input-icon"></i>
+          <input
+            type="password"
+            id="password"
+            class="form-input has-icon"
+            placeholder="Минимум 6 символов"
+            autocomplete="new-password"
+            required
+          />
+          <button type="button" class="form-input-toggle" id="togglePassword" tabindex="-1">
+            <i class="fas fa-eye" id="toggleIcon"></i>
+          </button>
+        </div>
+        <span class="form-error" id="passwordError">Пароль должен быть не менее 6 символов</span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="passwordConfirm">Подтверждение пароля</label>
+        <div class="form-input-wrapper">
+          <i class="fas fa-lock form-input-icon"></i>
+          <input
+            type="password"
+            id="passwordConfirm"
+            class="form-input has-icon"
+            placeholder="Повторите пароль"
+            autocomplete="new-password"
+            required
+          />
+          <button type="button" class="form-input-toggle" id="togglePasswordConfirm" tabindex="-1">
+            <i class="fas fa-eye" id="toggleIconConfirm"></i>
+          </button>
+        </div>
+        <span class="form-error" id="confirmError">Пароли не совпадают</span>
+      </div>
+
+      <button type="submit" class="btn btn-cta btn-full" id="registerBtn" style="margin-top:8px;">
+        <i class="fas fa-user-plus"></i>
+        Зарегистрироваться
+      </button>
+    </form>
+
+    <div class="auth-divider">или</div>
+
+    <a href="login.html" class="btn btn-ghost btn-full">
+      <i class="fas fa-right-to-bracket"></i>
+      Уже есть аккаунт? Войти
+    </a>
+
+    <div class="auth-footer" style="margin-top:20px; font-size:12px; color: var(--slate-300);">
+      Регистрируясь, вы соглашаетесь с условиями использования сервиса
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="app.js"></script>
+<script src="auth.js"></script>
+<script>
+  // If already logged in — redirect
+  (async () => {
+    const session = await checkSession();
+    if (session) window.location.href = 'dashboard.html';
+  })();
+
+  const registerForm = document.getElementById('registerForm');
+  const registerBtn = document.getElementById('registerBtn');
+  const regAlert = document.getElementById('regAlert');
+  const regSuccess = document.getElementById('regSuccess');
+  const regAlertMsg = document.getElementById('regAlertMsg');
+
+  // Password toggles
+  function setupToggle(btnId, inputId, iconId) {
+    document.getElementById(btnId).addEventListener('click', () => {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      const isHidden = input.type === 'password';
+      input.type = isHidden ? 'text' : 'password';
+      icon.className = isHidden ? 'fas fa-eye-slash' : 'fas fa-eye';
+    });
+  }
+
+  setupToggle('togglePassword', 'password', 'toggleIcon');
+  setupToggle('togglePasswordConfirm', 'passwordConfirm', 'toggleIconConfirm');
+
+  // Validation helpers
+  function showFieldError(errorId, inputId) {
+    document.getElementById(errorId).classList.add('show');
+    document.getElementById(inputId).classList.add('error');
+  }
+
+  function hideFieldError(errorId, inputId) {
+    document.getElementById(errorId).classList.remove('show');
+    document.getElementById(inputId).classList.remove('error');
+  }
+
+  // Clear errors on input
+  ['name', 'email', 'password', 'passwordConfirm'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      regAlert.classList.remove('show');
+    });
+  });
+
+  // Form submission
+  registerForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const passwordConfirm = document.getElementById('passwordConfirm').value;
+
+    let valid = true;
+
+    if (!name || name.length < 2) {
+      showFieldError('nameError', 'name');
+      valid = false;
+    } else {
+      hideFieldError('nameError', 'name');
+    }
+
+    if (!email || !email.includes('@') || !email.includes('.')) {
+      showFieldError('emailError', 'email');
+      valid = false;
+    } else {
+      hideFieldError('emailError', 'email');
+    }
+
+    if (!password || password.length < 6) {
+      showFieldError('passwordError', 'password');
+      valid = false;
+    } else {
+      hideFieldError('passwordError', 'password');
+    }
+
+    if (password !== passwordConfirm) {
+      showFieldError('confirmError', 'passwordConfirm');
+      valid = false;
+    } else {
+      hideFieldError('confirmError', 'passwordConfirm');
+    }
+
+    if (!valid) return;
+
+    // Loading state
+    registerBtn.classList.add('btn-loading');
+    registerBtn.disabled = true;
+    regAlert.classList.remove('show');
+
+    try {
+      const result = await registerUser(name, email, password);
+
+      if (result.success) {
+        regSuccess.classList.add('show');
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 900);
+      } else {
+        regAlertMsg.textContent = result.error || 'Ошибка регистрации. Попробуйте снова.';
+        regAlert.classList.add('show');
+        registerBtn.classList.remove('btn-loading');
+        registerBtn.disabled = false;
+      }
+    } catch (err) {
+      regAlertMsg.textContent = 'Ошибка соединения. Попробуйте позже.';
+      regAlert.classList.add('show');
+      registerBtn.classList.remove('btn-loading');
+      registerBtn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

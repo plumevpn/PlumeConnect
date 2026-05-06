@@ -1,0 +1,29 @@
+{
+  "name": "plume-connect",
+  "version": "1.0.0",
+  "description": "Plume Connect — VPN сервис с личным кабинетом",
+  "private": true,
+  "engines": {
+    "node": ">=18.x"
+  },
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'No build step required for static + serverless'",
+    "deploy": "vercel --prod",
+    "lint": "echo 'Add ESLint if needed'"
+  },
+  "dependencies": {
+    "@vercel/kv": "^1.0.0"
+  },
+  "devDependencies": {
+    "vercel": "^33.0.0"
+  },
+  "keywords": [
+    "vpn",
+    "plume-connect",
+    "vercel",
+    "serverless"
+  ],
+  "author": "Plume Connect Team",
+  "license": "UNLICENSED"
+}
